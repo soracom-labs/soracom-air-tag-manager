@@ -84,7 +84,7 @@ function updateTags(config, sim) {
         var putSimTagsUrl = config.url + "sims/" + sim.simId + "/tags"
         retryFetch(putSimTagsUrl, options)
     } catch (e) {
-        console.log(e);
+        throw e;
     };
 }
 
@@ -100,7 +100,6 @@ function retryFetch(url, options) {
       }
     } catch(e) {
       lastError = e;
-      console.log(e);
     }
     var wait = 30000 + Math.floor( Math.random() * 30001 );
     Utilities.sleep(wait);
