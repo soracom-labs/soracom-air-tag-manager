@@ -1,7 +1,7 @@
 # SORACOM Air Tag Manager
 SORACOM Air Tag Manager は、 Google Sheets で SORACOM Air タグを追加/更新するための Apps Script です。
 
-SORACOM Air にはキー値で任意の情報を割り当てるタグ機能がありますが、多くのSIMタグ情報を管理するには SORACOM API を使用する必要があり、タグ情報の管理に課題があります（2022年1月現在）。このリポジトリのスクリプトは、Google Sheets でタグマスターデータを管理し、タグを SORACOM のWebコンソールにまとめて適用する Apps Script を提供します。
+SORACOM Air にはキーバリューで任意の情報を割り当てるタグ機能がありますが、多くのSIMタグ情報を管理するには SORACOM API を使用する必要があり、タグ情報の管理には一手間かけないといけません（2022年1月現在）。このリポジトリのスクリプトは、Google Sheets でタグのマスターデータを管理し、タグを SORACOM のWebコンソールにまとめて適用する Apps Script を提供します。
 
 ![console](doc/img/sims.png)
 
@@ -18,25 +18,25 @@ Sheetsには2枚のシートを作成します。1枚目はタグマスターデ
 
 ![console](doc/img/sheets.png)
 
-`sims` シートでは、最初の行はタグキーのリスト、最初の列はSIMの一意のIDを示すSIM ID、残りの列はタグキーであり、タグパラメーターは続く行に入力されます。
-例に示すように、 `config` シートにAPIアクセス情報を入力します。
+`sims` シートでは、最初の行はタグキーのリストです。最初の列はSIMの一意のIDを示すSIM IDで残りの列はタグキーとなり、タグパラメーターは続く行に入力されます。
+`config` シートには次のAPIクレデンシャルの設定例で示すように、APIアクセス情報を入力します。
 
-既存のデータをマスタデータとして使用する場合は、SIMリスト情報のCSVエクスポート機能を使用してください。
+なお、既存の設定済タグデータをマスタデータとして使用する場合は、SIMリスト情報のCSVエクスポート機能を使用してください。
 
 - リファレンス (JP only): https://blog.soracom.com/ja-jp/2021/04/28/csv-export-list-of-sim-feature/
 
 ### 2. APIクレデンシャルの設定
 
-APIアクセス用のクレデンシャルapiKeyID（AuthKeyId）とapiKey（AuthKey Secret）を発行し、カバレッジと一緒に `config` に入力します。
+APIアクセス用のクレデンシャルapiKeyID（AuthKeyId）とapiKey（AuthKey Secret）を発行し、カバレッジ(`g` or `jp`)と一緒に `config` に入力します。
 
-クレデンシャルには `Sim：putSimTags` 権限が必要です。
+クレデンシャルには `Sim：putSimTags` 権限が必要です。予め設定を済ませておきましょう。
 
 - リファレンス (JP): https://users.soracom.io/ja-jp/docs/sam/create-sam-user/#%E8%AA%8D%E8%A8%BC%E3%82%AD%E3%83%BC%E3%81%AE%E7%94%9F%E6%88%90
 - リファレンス (EN): https://developers.soracom.io/en/docs/security/users-and-roles/#enabling-authkeys-authentication
 
 ![console](doc/img/config.png)
 
-### 3. スクリプトを構成して実行します
+### 3. スクリプトを設定して実行します
 Apps Script を Google Sheets に追加して実行します。
 
 ![console](doc/img/add-apps-script.png)
