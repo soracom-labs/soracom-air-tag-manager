@@ -37,29 +37,30 @@ function updateSIMs(config) {
 
 }
 
-function getTagKeys() {
+function getTagKeys(values) {
     // After the second column of the first row
-    var tagKeys = simsSheet.getDataRange().getValues()[0].slice(1);
+    var tagKeys = values[0].slice(1);
     return tagKeys;
 }
 
 function getSIMs() {
-    var tagsKeys = getTagKeys();
+    var values = simsSheet.getDataRange().getValues();
+    var tagsKeys = getTagKeys(values);
 
     // The second and subsequent rows are treated as a SIM list. Hidden rows are ignored.
-    var values = simsSheet.getDataRange().getValues().slice(1).filter(function(_, i) {return !simsSheet.isRowHiddenByFilter(i + 1)});
+    var cells = values.slice(1).filter(function(_, i) {return !simsSheet.isRowHiddenByFilter(i + 1)});
 
     var sims = [];
 
-    values.forEach(value => {
+    cells.forEach(cell => {
         var tags = [];
         var tagValueStartIndex = 1;
         tagsKeys.forEach(tagKey => {
-            tags.push({ tagName: tagKey, tagValue: value[tagValueStartIndex] + "" }); // tag API support only string value
+            tags.push({ tagName: tagKey, tagValue: cell[tagValueStartIndex] + "" }); // tag API support only string value
             tagValueStartIndex++;
         });
         sims.push({
-            simId: value[0],
+            simId: cell[0],
             tags: tags
         }
         );
@@ -81,11 +82,28 @@ function updateTags(config, sim) {
     };
     try {
         var putSimTagsUrl = config.url + "sims/" + sim.simId + "/tags"
-        var resp = UrlFetchApp.fetch(putSimTagsUrl, options);
-        if (resp.getResponseCode() != 200) {
-            throw new Error("tag update error, something went wrong");
-        };
+        retryFetch(putSimTagsUrl, options)
     } catch (e) {
-        alert(e.message);
+        console.log(e);
     };
+}
+
+function retryFetch(url, options) {
+  var lastError = null;
+  for(var i = 0; i < 3; i++) {
+    try {
+      var res = UrlFetchApp.fetch(url, options)
+      if(res.getResponseCode() == 200) {
+        return res.getContentText("UTF-8")
+      } else {
+        lastError = 'got unexpected status code: ' + res.getResponseCode() + ', ' + url;
+      }
+    } catch(e) {
+      lastError = e;
+      console.log(e);
+    }
+    var wait = 30000 + Math.floor( Math.random() * 30001 );
+    Utilities.sleep(wait);
+  }
+  throw lastError + ', ' + url
 }
